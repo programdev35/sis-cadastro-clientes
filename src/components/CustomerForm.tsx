@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -97,7 +96,19 @@ export function CustomerForm({ initialData, onSave }: CustomerFormProps) {
     try {
       const customer: Customer = {
         id: initialData?.id || crypto.randomUUID(),
-        ...data,
+        nomeCompleto: data.nomeCompleto,
+        cep: data.cep,
+        endereco: {
+          rua: data.endereco.rua,
+          numero: data.endereco.numero,
+          complemento: data.endereco.complemento,
+          bairro: data.endereco.bairro,
+        },
+        telefone: data.telefone,
+        whatsapp: data.whatsapp,
+        cidade: data.cidade,
+        uf: data.uf,
+        observacoes: data.observacoes,
         dataCadastro: initialData?.dataCadastro || new Date().toISOString(),
       };
       
