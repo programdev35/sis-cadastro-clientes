@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { customerSchema, type CustomerFormData } from '@/lib/validation';
 import { formatPhone, formatCep } from '@/lib/phone-mask';
-import { saveCustomer } from '@/lib/storage';
+import { useCustomers } from '@/hooks/useCustomers';
 import { Customer, ViaCepResponse } from '@/types/customer';
 import { toast } from '@/hooks/use-toast';
 import { Loader2, MapPin, Phone, User } from 'lucide-react';
@@ -27,11 +27,12 @@ interface CustomerFormProps {
 
 export function CustomerForm({ initialData, onSave }: CustomerFormProps) {
   const [isLoadingCep, setIsLoadingCep] = useState(false);
+  const { createCustomer, updateCustomer, isCreating, isUpdating } = useCustomers();
   
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     setValue,
     watch,
     reset,
@@ -93,47 +94,35 @@ export function CustomerForm({ initialData, onSave }: CustomerFormProps) {
   };
 
   const onSubmit = async (data: CustomerFormData) => {
-    try {
-      const customer: Customer = {
-        id: initialData?.id || crypto.randomUUID(),
-        nomeCompleto: data.nomeCompleto,
-        cep: data.cep,
-        endereco: {
-          rua: data.endereco.rua,
-          numero: data.endereco.numero,
-          complemento: data.endereco.complemento,
-          bairro: data.endereco.bairro,
-        },
-        telefone: data.telefone,
-        whatsapp: data.whatsapp,
-        cidade: data.cidade,
-        uf: data.uf,
-        observacoes: data.observacoes,
-        dataCadastro: initialData?.dataCadastro || new Date().toISOString(),
-      };
-      
-      saveCustomer(customer);
-      
-      toast({
-        title: initialData ? "Cliente atualizado!" : "Cliente cadastrado!",
-        description: initialData 
-          ? "As informações do cliente foram atualizadas com sucesso." 
-          : "O cliente foi cadastrado com sucesso no sistema.",
-      });
-      
-      if (!initialData) {
-        reset();
-      }
-      
-      onSave?.();
-    } catch (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: "Ocorreu um erro ao salvar o cliente. Tente novamente.",
-        variant: "destructive",
-      });
+    const customer: Customer = {
+      id: initialData?.id || crypto.randomUUID(),
+      nomeCompleto: data.nomeCompleto,
+      cep: data.cep,
+      endereco: {
+        rua: data.endereco.rua,
+        numero: data.endereco.numero,
+        complemento: data.endereco.complemento,
+        bairro: data.endereco.bairro,
+      },
+      telefone: data.telefone,
+      whatsapp: data.whatsapp,
+      cidade: data.cidade,
+      uf: data.uf,
+      observacoes: data.observacoes,
+      dataCadastro: initialData?.dataCadastro || new Date().toISOString(),
+    };
+    
+    if (initialData) {
+      updateCustomer({ id: initialData.id, data: customer });
+    } else {
+      createCustomer(customer);
+      reset();
     }
+    
+    onSave?.();
   };
+
+  const isSubmitting = isCreating || isUpdating;
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

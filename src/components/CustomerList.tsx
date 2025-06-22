@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,41 +7,20 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Customer } from '@/types/customer';
-import { getCustomers, deleteCustomer } from '@/lib/storage';
+import { useCustomers } from '@/hooks/useCustomers';
 import { CustomerForm } from './CustomerForm';
 import { toast } from '@/hooks/use-toast';
-import { Search, Users, Phone, MapPin, Edit, Trash2, Eye, Calendar, Filter } from 'lucide-react';
+import { Search, Users, Phone, MapPin, Edit, Trash2, Eye, Calendar, Filter, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export function CustomerList() {
-  const [customers, setCustomers] = useState<Customer[]>(getCustomers());
+  const { customers, deleteCustomer, isLoading, isDeleting } = useCustomers();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'nome' | 'data' | 'cidade'>('nome');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-
-  const refreshCustomers = () => {
-    setCustomers(getCustomers());
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      deleteCustomer(id);
-      refreshCustomers();
-      toast({
-        title: "Cliente removido",
-        description: "O cliente foi removido com sucesso.",
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao remover",
-        description: "Ocorreu um erro ao remover o cliente.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const filteredAndSortedCustomers = useMemo(() => {
     let filtered = customers.filter(customer =>
@@ -73,6 +51,15 @@ export function CustomerList() {
       return 'Data inválida';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Carregando clientes...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -287,7 +274,6 @@ export function CustomerList() {
                           <CustomerForm
                             initialData={selectedCustomer}
                             onSave={() => {
-                              refreshCustomers();
                               setIsEditDialogOpen(false);
                               setSelectedCustomer(null);
                             }}
@@ -298,8 +284,17 @@ export function CustomerList() {
                     
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-destructive hover:text-destructive"
+                          disabled={isDeleting}
+                        >
+                          {isDeleting ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
@@ -313,7 +308,7 @@ export function CustomerList() {
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancelar</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => handleDelete(customer.id)}
+                            onClick={() => deleteCustomer(customer.id)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
                             Excluir
