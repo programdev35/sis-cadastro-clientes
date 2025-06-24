@@ -48,9 +48,15 @@ export function AdminPage() {
     },
     onError: (error: any) => {
       console.error('Error creating user:', error);
+      let errorMessage = "Ocorreu um erro ao criar o usuário.";
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Erro ao criar usuário",
-        description: error.message || "Ocorreu um erro ao criar o usuário.",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -98,6 +104,25 @@ export function AdminPage() {
     const password = formData.get('password') as string;
     const nome = formData.get('nome') as string;
     const role = formData.get('role') as 'admin' | 'operator';
+    
+    // Validações básicas
+    if (!email || !password || !nome || !role) {
+      toast({
+        title: "Erro de validação",
+        description: "Todos os campos são obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (password.length < 6) {
+      toast({
+        title: "Erro de validação",
+        description: "A senha deve ter pelo menos 6 caracteres.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     createUserMutation.mutate({ email, password, nome, role });
   };

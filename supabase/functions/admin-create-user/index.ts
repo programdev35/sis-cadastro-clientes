@@ -42,10 +42,12 @@ Deno.serve(async (req) => {
       
       // Handle specific error messages
       let errorMessage = 'Erro ao criar usuário'
-      if (createError.message.includes('already registered')) {
-        errorMessage = 'Este email já está cadastrado'
+      if (createError.message.includes('already registered') || createError.message.includes('User already registered')) {
+        errorMessage = 'Este email já está cadastrado no sistema'
       } else if (createError.message.includes('Password')) {
         errorMessage = 'Senha deve ter pelo menos 6 caracteres'
+      } else if (createError.message.includes('email')) {
+        errorMessage = 'Email inválido'
       }
       
       return new Response(

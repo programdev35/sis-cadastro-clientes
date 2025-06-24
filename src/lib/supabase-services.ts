@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import type { Customer } from '@/types/customer';
 import type { Database } from '@/integrations/supabase/types';
@@ -106,7 +107,7 @@ export const userService = {
       .from('profiles')
       .select(`
         *,
-        user_roles!inner(role)
+        user_roles(role)
       `)
       .order('created_at', { ascending: false });
     
@@ -154,7 +155,7 @@ export const userService = {
 
     if (error) {
       console.error('Error calling admin-create-user function:', error);
-      throw error;
+      throw new Error('Erro de conexão com o servidor');
     }
 
     if (data?.error) {
