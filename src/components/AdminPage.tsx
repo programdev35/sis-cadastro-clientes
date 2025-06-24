@@ -18,11 +18,9 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export function AdminPage() {
-  const { signUp, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
   // Query para buscar usuários
@@ -30,6 +28,32 @@ export function AdminPage() {
     queryKey: ['profiles'],
     queryFn: userService.getProfiles,
     enabled: isAdmin,
+  });
+
+  // Mutation para criar usuário
+  const createUserMutation = useMutation({
+    mutationFn: ({ email, password, nome, role }: { 
+      email: string; 
+      password: string; 
+      nome: string; 
+      role: 'admin' | 'operator' 
+    }) => userService.createUser(email, password, nome, role),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profiles'] });
+      setIsCreateDialogOpen(false);
+      toast({
+        title: "Usuário criado!",
+        description: "O usuário foi criado com sucesso e já pode fazer login no sistema.",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error creating user:', error);
+      toast({
+        title: "Erro ao criar usuário",
+        description: error.message || "Ocorreu um erro ao criar o usuário.",
+        variant: "destructive",
+      });
+    },
   });
 
   // Mutation para atualizar role do usuário
@@ -68,8 +92,6 @@ export function AdminPage() {
 
   const handleCreateUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
     
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
@@ -77,48 +99,7 @@ export function AdminPage() {
     const nome = formData.get('nome') as string;
     const role = formData.get('role') as 'admin' | 'operator';
     
-    try {
-      const { error: signUpError } = await signUp(email, password, nome);
-      if (signUpError) {
-        setError(signUpError.message.includes('already registered') 
-          ? 'Este email já está cadastrado.' 
-          : 'Erro ao criar usuário.');
-        return;
-      }
-      
-      // Aguardar um pouco para que o usuário seja criado
-      setTimeout(async () => {
-        try {
-          // Buscar o usuário recém-criado para definir o role
-          const updatedProfiles = await userService.getProfiles();
-          const newUser = updatedProfiles.find(p => p.email === email);
-          
-          if (newUser && role) {
-            await userService.updateUserRole(newUser.id, role);
-          }
-          
-          queryClient.invalidateQueries({ queryKey: ['profiles'] });
-          setIsCreateDialogOpen(false);
-          
-          toast({
-            title: "Usuário criado!",
-            description: `Usuário ${nome} criado com sucesso com permissão de ${role}.`,
-          });
-        } catch (roleError) {
-          console.error('Erro ao definir role:', roleError);
-          toast({
-            title: "Usuário criado com aviso",
-            description: "Usuário criado, mas houve erro ao definir permissões. Defina manualmente.",
-            variant: "destructive",
-          });
-        }
-      }, 2000);
-      
-    } catch (err) {
-      setError('Erro inesperado. Tente novamente.');
-    } finally {
-      setIsLoading(false);
-    }
+    createUserMutation.mutate({ email, password, nome, role });
   };
 
   const handleUpdateRole = (userId: string, role: 'admin' | 'operator') => {
@@ -176,7 +157,7 @@ export function AdminPage() {
                 <DialogHeader>
                   <DialogTitle>Criar Novo Usuário</DialogTitle>
                   <DialogDescription>
-                    Adicione um novo usuário ao sistema
+                    Adicione um novo usuário ao sistema. O usuário criado já poderá fazer login imediatamente.
                   </DialogDescription>
                 </DialogHeader>
                 
@@ -188,6 +169,7 @@ export function AdminPage() {
                       name="nome"
                       placeholder="Nome completo"
                       required
+                      disabled={createUserMutation.isPending}
                     />
                   </div>
                   
@@ -199,6 +181,7 @@ export function AdminPage() {
                       type="email"
                       placeholder="usuario@exemplo.com"
                       required
+                      disabled={createUserMutation.isPending}
                     />
                   </div>
                   
@@ -211,12 +194,13 @@ export function AdminPage() {
                       placeholder="••••••••"
                       minLength={6}
                       required
+                      disabled={createUserMutation.isPending}
                     />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="role">Permissão</Label>
-                    <Select name="role" required>
+                    <Select name="role" required disabled={createUserMutation.isPending}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione a permissão" />
                       </SelectTrigger>
@@ -227,14 +211,12 @@ export function AdminPage() {
                     </Select>
                   </div>
                   
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-                  
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={createUserMutation.isPending}
+                  >
+                    {createUserMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Criar Usuário
                   </Button>
                 </form>

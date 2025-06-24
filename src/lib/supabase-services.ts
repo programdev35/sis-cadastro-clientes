@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import type { Customer } from '@/types/customer';
 import type { Database } from '@/integrations/supabase/types';
@@ -107,10 +106,15 @@ export const userService = {
       .from('profiles')
       .select(`
         *,
-        user_roles(role)
-      `);
+        user_roles!inner(role)
+      `)
+      .order('created_at', { ascending: false });
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching profiles:', error);
+      throw error;
+    }
+    
     return data;
   },
 
@@ -134,6 +138,31 @@ export const userService = {
       });
     
     if (error) throw error;
+  },
+
+  async createUser(email: string, password: string, nome: string, role: 'admin' | 'operator') {
+    console.log('Calling admin-create-user function with:', { email, nome, role });
+    
+    const { data, error } = await supabase.functions.invoke('admin-create-user', {
+      body: {
+        email,
+        password,
+        nome,
+        role
+      }
+    });
+
+    if (error) {
+      console.error('Error calling admin-create-user function:', error);
+      throw error;
+    }
+
+    if (data?.error) {
+      console.error('Function returned error:', data.error);
+      throw new Error(data.error);
+    }
+
+    return data;
   }
 };
 
