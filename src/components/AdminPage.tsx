@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,10 +23,11 @@ export function AdminPage() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
   // Query para buscar usuários
-  const { data: profiles = [], isLoading: profilesLoading } = useQuery({
+  const { data: profiles = [], isLoading: profilesLoading, refetch: refetchProfiles } = useQuery({
     queryKey: ['profiles'],
     queryFn: userService.getProfiles,
     enabled: isAdmin,
+    refetchOnWindowFocus: true,
   });
 
   // Mutation para criar usuário
@@ -124,7 +124,15 @@ export function AdminPage() {
       return;
     }
     
-    createUserMutation.mutate({ email, password, nome, role });
+    try {
+      await createUserMutation.mutateAsync({ email, password, nome, role });
+      // Força uma nova busca dos perfis após criar usuário
+      setTimeout(() => {
+        refetchProfiles();
+      }, 1000);
+    } catch (error) {
+      console.error('Error in handleCreateUser:', error);
+    }
   };
 
   const handleUpdateRole = (userId: string, role: 'admin' | 'operator') => {
@@ -141,8 +149,18 @@ export function AdminPage() {
 
   // Função para obter o role do usuário
   const getUserRole = (profile: any) => {
-    return profile.user_roles?.[0]?.role || 'operator';
+    // Se user_roles é um array, pega o primeiro
+    if (Array.isArray(profile.user_roles) && profile.user_roles.length > 0) {
+      return profile.user_roles[0].role;
+    }
+    // Se user_roles é um objeto
+    if (profile.user_roles && profile.user_roles.role) {
+      return profile.user_roles.role;
+    }
+    return 'operator';
   };
+
+  console.log('Profiles in component:', profiles);
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
@@ -164,7 +182,7 @@ export function AdminPage() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                Usuários do Sistema
+                Usuários do Sistema ({profiles.length})
               </CardTitle>
               <CardDescription>
                 Gerencie todos os usuários e suas permissões
@@ -255,6 +273,17 @@ export function AdminPage() {
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin" />
               <span className="ml-2">Carregando usuários...</span>
+            </div>
+          ) : profiles.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Nenhum usuário encontrado.</p>
+              <Button 
+                onClick={() => refetchProfiles()} 
+                variant="outline" 
+                className="mt-2"
+              >
+                Recarregar
+              </Button>
             </div>
           ) : (
             <Table>

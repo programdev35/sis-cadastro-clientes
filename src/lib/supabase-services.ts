@@ -106,8 +106,13 @@ export const userService = {
     const { data, error } = await supabase
       .from('profiles')
       .select(`
-        *,
-        user_roles(role)
+        id,
+        email,
+        nome,
+        created_at,
+        user_roles (
+          role
+        )
       `)
       .order('created_at', { ascending: false });
     
@@ -116,6 +121,7 @@ export const userService = {
       throw error;
     }
     
+    console.log('Profiles data:', data);
     return data;
   },
 
