@@ -133,6 +133,11 @@ export function AdminPage() {
     }
   };
 
+  // Função para obter o role do usuário
+  const getUserRole = (profile: any) => {
+    return profile.user_roles?.[0]?.role || 'operator';
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
       <Card>
@@ -261,8 +266,8 @@ export function AdminPage() {
                     <TableCell className="font-medium">{profile.nome}</TableCell>
                     <TableCell>{profile.email}</TableCell>
                     <TableCell>
-                      <Badge variant={profile.user_roles?.[0]?.role === 'admin' ? 'default' : 'secondary'}>
-                        {profile.user_roles?.[0]?.role === 'admin' ? 'Administrador' : 'Operador'}
+                      <Badge variant={getUserRole(profile) === 'admin' ? 'default' : 'secondary'}>
+                        {getUserRole(profile) === 'admin' ? 'Administrador' : 'Operador'}
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDate(profile.created_at)}</TableCell>
@@ -288,8 +293,8 @@ export function AdminPage() {
                           <div className="space-y-4">
                             <div className="space-y-2">
                               <Label>Permissão Atual</Label>
-                              <Badge variant={profile.user_roles?.[0]?.role === 'admin' ? 'default' : 'secondary'}>
-                                {profile.user_roles?.[0]?.role === 'admin' ? 'Administrador' : 'Operador'}
+                              <Badge variant={getUserRole(profile) === 'admin' ? 'default' : 'secondary'}>
+                                {getUserRole(profile) === 'admin' ? 'Administrador' : 'Operador'}
                               </Badge>
                             </div>
                             
@@ -297,7 +302,7 @@ export function AdminPage() {
                               <Label>Nova Permissão</Label>
                               <div className="flex gap-2">
                                 <Button
-                                  variant={profile.user_roles?.[0]?.role === 'operator' ? 'default' : 'outline'}
+                                  variant={getUserRole(profile) === 'operator' ? 'default' : 'outline'}
                                   size="sm"
                                   onClick={() => handleUpdateRole(profile.id, 'operator')}
                                   disabled={updateRoleMutation.isPending}
@@ -305,7 +310,7 @@ export function AdminPage() {
                                   Operador
                                 </Button>
                                 <Button
-                                  variant={profile.user_roles?.[0]?.role === 'admin' ? 'default' : 'outline'}
+                                  variant={getUserRole(profile) === 'admin' ? 'default' : 'outline'}
                                   size="sm"
                                   onClick={() => handleUpdateRole(profile.id, 'admin')}
                                   disabled={updateRoleMutation.isPending}
