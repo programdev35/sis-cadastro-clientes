@@ -1,20 +1,106 @@
-# Welcome to your Lovable project
+# Sistema de Cadastro de Clientes
 
-## Project info
+## Descrição
 
-**URL**: https://lovable.dev/projects/e46708a8-f212-413c-a289-e28c04d3538a
+Este é um sistema web para cadastro e gerenciamento de clientes, desenvolvido com React, Vite e TypeScript. O projeto utiliza componentes Shadcn UI e está configurado para deploy na Vercel.
 
-## How can I edit this code?
+## Tecnologias
 
-There are several ways of editing your application.
+- React
+- TypeScript
+- Vite
+- Shadcn UI
+- Radix UI
+- Tailwind CSS
 
-**Use Lovable**
+## Configuração do Projeto
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e46708a8-f212-413c-a289-e28c04d3538a) and start prompting.
+### Pré-requisitos
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js (versão LTS recomendada)
+- npm ou yarn
+- Conta na Vercel para deploy
 
-**Use your preferred IDE**
+### Instalação
+
+1. Clone o repositório:
+```bash
+git clone [URL_DO_REPOSITORIO]
+```
+
+2. Instale as dependências:
+```bash
+npm install
+```
+
+### Desenvolvimento Local
+
+Para rodar o projeto em modo de desenvolvimento:
+
+```bash
+npm run dev
+```
+
+O servidor de desenvolvimento será iniciado na porta 8080 (http://localhost:8080).
+
+### Build
+
+Para criar uma versão de produção do projeto:
+
+```bash
+npm run build
+```
+
+### Deploy na Vercel
+
+1. Faça o login na Vercel (https://vercel.com)
+2. Conecte seu repositório GitHub/Bitbucket
+3. A Vercel detectará automaticamente as configurações do projeto e iniciará o deploy
+4. Monitore o progresso do deploy no dashboard da Vercel
+
+## Estrutura do Projeto
+
+```
+src/
+├── components/    # Componentes React
+├── pages/         # Páginas da aplicação
+├── styles/        # Estilos globais
+└── utils/        # Funções utilitárias
+```
+
+## Configurações
+
+### Vercel
+
+O arquivo `vercel.json` está configurado com:
+- Build usando `@vercel/static-build`
+- Configurações de reescrita de rotas
+- Headers de segurança
+- Ambiente de produção
+
+### Vite
+
+O arquivo `vite.config.ts` está configurado com:
+- Suporte a TypeScript
+- Plugins React
+- Aliases de importação
+- Configurações de desenvolvimento
+
+## Contribuição
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+
+## Suporte
+
+Para suporte ou dúvidas, abra uma issue no repositório ou entre em contato pelo email: [seu-email@dominio.com]
 
 If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
