@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,7 +58,7 @@ const Index = () => {
   };
 
   return (
-    <ThemeProvider defaultTheme="light" storageKey="customer-system-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="customer-system-theme">
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
         {/* Header */}
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -67,7 +66,7 @@ const Index = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-primary-foreground" />
+                  <img src="/logo-clientes.png" alt="Logo do Sistema" className="h-8 w-8" />
                 </div>
                 <div>
                   <h1 className="text-xl font-bold gradient-text">Sistema de Clientes</h1>
@@ -159,7 +158,7 @@ const Index = () => {
         <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 mt-16">
           <div className="container mx-auto px-4 py-6">
             <div className="text-center text-sm text-muted-foreground">
-              <p>© 2024 Sistema de Clientes. Desenvolvido com ❤️ para otimizar seu atendimento.</p>
+              <p>Copyright© 2025 Sistema de Cadastro de Clientes. Desenvolvido por Elissandro Oliveira para otimizar seu atendimento.</p>
             </div>
           </div>
         </footer>
