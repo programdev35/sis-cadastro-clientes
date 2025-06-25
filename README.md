@@ -4,6 +4,31 @@
 
 Este é um sistema web para cadastro e gerenciamento de clientes, desenvolvido com React, Vite e TypeScript. O projeto utiliza componentes Shadcn UI e está configurado para deploy na Vercel.
 
+## Funcionalidades
+
+### Gestão de Clientes
+- Cadastro completo de clientes com:
+  - Informações pessoais (nome, CPF, RG)
+  - Contatos (telefone, e-mail)
+  - Endereço (rua, número, complemento, bairro, cidade, estado, CEP)
+  - Data de cadastro
+  - Observações
+
+### Interface do Usuário
+- Interface moderna e responsiva com tema claro/escuro
+- Lista de clientes com filtros e ordenação
+- Formulário de cadastro/editar com validação
+- Sistema de notificações
+- Autenticação de usuários
+
+### Características Técnicas
+- Validação de dados em tempo real
+- Máscaras para telefone e CEP
+- Integração com API de CEP
+- Sistema de autenticação
+- Armazenamento em banco de dados
+- Suporte a múltiplos usuários
+
 ## Tecnologias
 
 - React
