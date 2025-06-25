@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import type { Customer } from '@/types/customer';
 import type { Database } from '@/integrations/supabase/types';
@@ -170,6 +169,17 @@ export const userService = {
     }
 
     return data;
+  },
+
+  async deleteUser(userId: string) {
+    // Chama o endpoint backend seguro que faz a deleção
+    const response = await fetch('/api/delete-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    });
+    const data = await response.json();
+    if (!response.ok || data?.error) throw new Error(data?.error || 'Erro ao deletar usuário');
   }
 };
 
